@@ -90,20 +90,41 @@ body.editing [contenteditable]:focus{box-shadow:inset 0 0 0 1.5px var(--purple);
 
 /* socials */
 .socials{display:flex;gap:13px;justify-content:center;margin-top:22px}
-.social{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+.social{width:48px;height:48px;flex:0 0 48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
   transition:.22s;text-decoration:none;color:#fff}
 .social svg{width:22px;height:22px;fill:currentColor}
 .social.yt{background:#ff0000}
 .social.x{background:#000;border:1px solid #3a3a44}
+.social.ig{background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}
+.social.dc{background:#5865f2}
+button.social{border:0;padding:0;cursor:pointer;font:inherit;color:#fff}
+.social-copied{height:16px;margin-top:10px;text-align:center;font-weight:700;font-size:12.5px;color:var(--blue);opacity:0;transition:.2s}
+.social-copied.show{opacity:1}
 .social:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(176,124,240,.35)}
 
 /* programs */
-.programs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:24px}
-.prog{display:flex;align-items:center;gap:9px;background:var(--bg-2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);
-  border-radius:13px;padding:8px 14px;font-weight:600;font-size:13px}
+.programs{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:24px}
+.prog-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.prog{background:var(--bg-2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);
+  border-radius:13px;font-weight:600;font-size:13px;overflow:hidden;transition:border-color .2s}
+.prog[open]{border-color:rgba(255,255,255,.2)}
+/* After Effects = main program, on its own row with a subtle theme-tinted fill */
+.prog-main{background-color:var(--bg-2);
+  background-image:linear-gradient(135deg,rgba(255,111,165,.06),rgba(176,124,240,.07));
+  border-color:rgba(255,170,210,.2);box-shadow:0 0 14px rgba(255,140,200,.18)}
+.prog-main[open]{border-color:rgba(255,170,210,.34);box-shadow:0 0 16px rgba(255,140,200,.24)}
+.prog-head{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;list-style:none;user-select:none}
+.prog-head::-webkit-details-marker{display:none}
+.prog .chev{width:13px;height:13px;margin-left:2px;fill:none;stroke:currentColor;stroke-width:2.4;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.5;transition:transform .22s}
+.prog[open] .chev{transform:rotate(180deg)}
 .prog .ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;
   font-size:12px;font-weight:700;color:#fff;flex:none}
-.prog small{display:block;font-size:10px;color:var(--pink);font-weight:700;letter-spacing:.05em}
+.prog small{display:inline-block;margin-left:6px;font-size:10px;color:var(--pink);font-weight:700;letter-spacing:.05em;vertical-align:middle}
+/* width:0 + min-width:100% lets the desc stretch the pill vertically without ever widening it (so siblings never shift) */
+.prog-desc{display:none;width:0;min-width:100%;box-sizing:border-box;overflow-wrap:anywhere;
+  padding:2px 14px 12px;font-size:12px;font-weight:500;line-height:1.5;color:var(--muted)}
+.prog[open] .prog-desc{display:block}
 .ae{background:linear-gradient(135deg,#1f1145,#5b3df5)}
 .pr{background:linear-gradient(135deg,#2a1145,#9a5cff)}
 /* simplified DaVinci Resolve color-wheel mark */
@@ -122,12 +143,21 @@ body.editing [contenteditable]:focus{box-shadow:inset 0 0 0 1.5px var(--purple);
   transition:.2s;position:relative}
 .tab:hover:not(.active){color:#fff;background:rgba(255,255,255,.08)}
 .tab.active{background:var(--grad-btn);color:#fff;box-shadow:var(--btn-glow)}
-/* differentiated Montage / AMV tab — italic + pink accent, with a quiet divider before it */
-.tab.tab-amv{font-style:italic;letter-spacing:.015em;margin-left:5px}
+/* differentiated AMV tab — pink-accent label with a quiet divider before it */
+.tab.tab-amv{margin-left:5px}
+.tab.tab-amv:not(.active){color:#ffb3d6}
 .tab.tab-amv::before{content:"";position:absolute;left:-5px;top:18%;bottom:18%;width:1px;
   background:var(--line)}
-.tab.tab-amv:not(.active){color:#ff9fd0}
 .tab.tab-amv.active::before{display:none}
+/* portrait phones: keep all tabs on one row (no wrapping Montage / AMV) */
+@media(max-width:520px){
+  .tab-group{flex-wrap:nowrap;max-width:100%;gap:2px;
+    overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tab-group::-webkit-scrollbar{display:none}
+  .tab{padding:8px 12px;font-size:12.5px;white-space:nowrap}
+  .tab.tab-amv{margin-left:4px}
+  .tab.tab-amv::before{left:-4px}
+}
 
 /* montage intro note (only visible on the Montage tab) */
 .montage-note{display:none;margin:0 auto 26px;max-width:640px;text-align:center;font-size:15px;
@@ -153,8 +183,8 @@ body.editing [contenteditable]:focus{box-shadow:inset 0 0 0 1.5px var(--purple);
 
 /* remake + early-edit labels */
 .card-foot{position:absolute;right:13px;bottom:11px;display:flex;align-items:center}
-.badge-remake{font-size:10.5px;font-weight:700;
-  letter-spacing:.05em;text-transform:uppercase;padding:4px 11px;border-radius:9px;
+.badge-remake{font-size:9px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:7px;
   background:rgba(255,111,165,.24);border:1px solid rgba(255,111,165,.55);color:#ffcfe0;
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .badge-early{position:absolute;bottom:9px;left:9px;z-index:2;font-size:10px;font-weight:600;
@@ -277,12 +307,30 @@ body>*:not(.bg-scene):not(.bottom-glow){position:relative;z-index:1}
     <a class="social x" href="https://x.com/achrn_" target="_blank" rel="noopener" title="Twitter / X">
       <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
     </a>
+    <a class="social ig" href="https://www.instagram.com/achrnn_/" target="_blank" rel="noopener" title="Instagram">
+      <svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.12 1.38C1.36 2.67.95 3.34.64 4.13.34 4.9.14 5.77.08 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.28.26 2.15.56 2.92.31.79.72 1.46 1.38 2.12.66.66 1.33 1.07 2.12 1.38.77.3 1.64.5 2.92.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.28-.06 2.15-.26 2.92-.56a5.86 5.86 0 0 0 2.12-1.38c.66-.66 1.07-1.33 1.38-2.12.3-.77.5-1.64.56-2.92.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.28-.26-2.15-.56-2.92a5.86 5.86 0 0 0-1.38-2.12A5.86 5.86 0 0 0 19.87.63c-.77-.3-1.64-.5-2.92-.56C15.67.01 15.26 0 12 0m0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84M12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4m6.41-10.85a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44"/></svg>
+    </a>
+    <button class="social dc" id="discordTop" type="button" title="Copy Discord: achrnn">
+      <svg viewBox="0 0 24 24"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.487 0 12.6 12.6 0 0 0-.617-1.25.077.077 0 0 0-.079-.036A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.056c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.331c-1.182 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419z"/></svg>
+    </button>
   </div>
+  <div class="social-copied" id="socialCopied">Discord username copied!</div>
 
   <div class="programs">
-    <div class="prog"><span class="ic ae">Ae</span><span>After Effects<small>MAIN</small></span></div>
-    <div class="prog"><span class="ic pr">Pr</span><span>Premiere Pro</span></div>
-    <div class="prog"><span class="ic dr"></span><span>DaVinci Resolve</span></div>
+    <details class="prog prog-main">
+      <summary class="prog-head"><span class="ic ae">Ae</span><span>After Effects</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="prog-desc">Final Draft + Edits</div>
+    </details>
+    <div class="prog-row">
+      <details class="prog">
+        <summary class="prog-head"><span class="ic pr">Pr</span><span>Premiere Pro</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+        <div class="prog-desc">Raw Cuts + Minor Edits</div>
+      </details>
+      <details class="prog">
+        <summary class="prog-head"><span class="ic dr"></span><span>DaVinci Resolve</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+        <div class="prog-desc">Raw Cuts + Color Grading</div>
+      </details>
+    </div>
   </div>
 </div>
 
@@ -293,13 +341,13 @@ body>*:not(.bg-scene):not(.bottom-glow){position:relative;z-index:1}
       <button class="tab active" data-cat="all">All</button>
       <button class="tab" data-cat="long">Long-form</button>
       <button class="tab" data-cat="shorts">Shorts</button>
-      <button class="tab tab-amv" data-cat="montage">Montage / AMV</button>
+      <button class="tab tab-amv" data-cat="montage">AMV</button>
     </div>
   </div>
   <div class="montage-note" id="montageNote">
     These are just some passion projects I made since the start of my editing journey!
     If you make it all the way to the bottom you'll see some of my first edits! <em>(please don't)</em>
-    <div class="remake-note"><span class="badge-remake">Remake</span> a remake is my own rendition of another AMV creator's edit &mdash; think of it like an art study, but for editing.</div>
+    <div class="remake-note"><span class="badge-remake">Remake</span> A remake is my own rendition of another AMV creator's edit &mdash; think of it like an art study, but for editing.</div>
   </div>
   <div class="grid" id="grid"></div>
   <div class="more-wrap"><button class="more-btn alt" id="lessBtn" hidden>Show less</button><button class="more-btn" id="moreBtn">Show more</button><button class="more-btn" id="collapseBtn" hidden>Collapse</button></div>
@@ -326,7 +374,7 @@ body>*:not(.bg-scene):not(.bottom-glow){position:relative;z-index:1}
   <div class="wrap">
     <h2>Got a project?<br><span class="grad-text">Contact me.</span></h2>
     <div class="cbtns">
-      <a href="mailto:arkans1103@gmail.com" class="btn btn-mail">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=arkans1103@gmail.com" target="_blank" rel="noopener" class="btn btn-mail">
         <svg viewBox="0 0 24 24"><path d="M3.5 5h17A1.5 1.5 0 0 1 22 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 17.5v-11A1.5 1.5 0 0 1 3.5 5Zm.7 2L12 12l7.8-5H4.2Z"/></svg>
         arkans1103@gmail.com
       </a>
@@ -486,6 +534,11 @@ const dBtn=document.getElementById('discordBtn'),copied=document.getElementById(
 dBtn.addEventListener('click',()=>{
   navigator.clipboard&&navigator.clipboard.writeText('achrnn');
   copied.classList.add('show');setTimeout(()=>copied.classList.remove('show'),1600);
+});
+const dTop=document.getElementById('discordTop'),socialCopied=document.getElementById('socialCopied');
+dTop&&dTop.addEventListener('click',()=>{
+  navigator.clipboard&&navigator.clipboard.writeText('achrnn');
+  socialCopied.classList.add('show');setTimeout(()=>socialCopied.classList.remove('show'),1600);
 });
 
 /* ---------- edit mode (#edit only) ---------- */
