@@ -233,6 +233,7 @@ button.social{border:0;padding:0;cursor:pointer;font:inherit;color:#fff}
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .badge--long{background:rgba(95,182,255,.6);border-color:rgba(255,255,255,.45);color:#fff}
 .badge--shorts{background:rgba(255,111,165,.6);border-color:rgba(255,255,255,.45);color:#fff}
+.badge--edits{background:rgba(45,200,170,.6);border-color:rgba(255,255,255,.45);color:#fff}
 .badge--montage{background:rgba(176,124,240,.6);border-color:rgba(255,255,255,.45);color:#fff;font-style:italic}
 .card-body{padding:13px 15px;position:relative}
 .v-title{font-size:15px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;
@@ -402,6 +403,7 @@ body>*:not(.bg-scene):not(.bottom-glow){position:relative;z-index:1}
       <button class="tab active" data-cat="all">All</button>
       <button class="tab" data-cat="long">Long-form</button>
       <button class="tab" data-cat="shorts">Shorts</button>
+      <button class="tab" data-cat="edits">Edits</button>
       <button class="tab tab-amv" data-cat="montage">AMV</button>
     </div>
   </div>
@@ -469,10 +471,14 @@ const VIDEOS=[
   {id:'CFyaCSc_qpU', type:'shorts'},
   {id:'k3JvZXCZgGE', type:'shorts'},
   {id:'7YLGbUR3BpI', type:'shorts'},
+  // Edits
+  {id:'zKCzv87rphI', type:'edits'},
+  {id:'mzD_AwX1h5I', type:'edits'},
   // Montage / AMV  (remake:true = your rendition of another editor's edit)
   {id:'zvqfKVPwB3Y', type:'montage'},
   {id:'g6348xePyjE', type:'montage'},
   {id:'d6iXjke95qw', type:'montage'},
+  {id:'PygLxckrXtw', type:'montage'},
   {id:'NshpXBxK96g', type:'montage', remake:true},
   {id:'bMEwA4E2xRM', type:'montage'},
   {id:'-2yi40c-ydA', type:'montage'},
@@ -499,8 +505,8 @@ const VIDEOS=[
 ];
 
 const PAGE=12;
-const LABEL={long:'Long-form',shorts:'Short',montage:'Montage / AMV'};
-const BADGE={long:'Long-form',shorts:'Short',montage:'AMV'};
+const LABEL={long:'Long-form',shorts:'Short',edits:'Edit',montage:'Montage / AMV'};
+const BADGE={long:'Long-form',shorts:'Short',edits:'Edit',montage:'AMV'};
 const grid=document.getElementById('grid');
 const moreBtn=document.getElementById('moreBtn');
 const lessBtn=document.getElementById('lessBtn');
