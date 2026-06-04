@@ -137,6 +137,11 @@ body.editing [contenteditable]:focus{box-shadow:inset 0 0 0 1.5px var(--purple);
 .card.is-early{opacity:.82}
 .card.is-early:hover{opacity:1}
 
+/* full-width divider between recent and early montage edits */
+.early-divider{grid-column:1/-1;display:flex;align-items:center;gap:16px;margin:14px 0 2px;
+  color:rgba(255,255,255,.55);font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.early-divider::before,.early-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+
 /* ---------- work grid ---------- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;align-items:start}
 .card{background:var(--bg-2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:.28s}
@@ -372,17 +377,27 @@ const cards=VIDEOS.map(v=>{
   });
   grid.appendChild(el);
   loadTitle(el,v.id);
-  return {el,cat:v.type};
+  return {el,cat:v.type,early:!!v.early};
 });
+
+/* divider inserted before the first early montage card */
+const earlyDivider=document.createElement('div');
+earlyDivider.className='early-divider';
+earlyDivider.textContent='Early edits';
+const firstEarly=cards.find(c=>c.early);
+if(firstEarly)grid.insertBefore(earlyDivider,firstEarly.el);
 
 /* ---------- filter + pagination (9 at a time) ---------- */
 let activeCat='all', shown=PAGE;
 function render(){
   const matches=cards.filter(c=>activeCat==='all'||c.cat===activeCat);
   cards.forEach(c=>{c.el.style.display='none';});
-  matches.slice(0,shown).forEach(c=>{c.el.style.display='';});
+  const visible=matches.slice(0,shown);
+  visible.forEach(c=>{c.el.style.display='';});
   moreBtn.hidden = matches.length<=shown;
   montageNote.style.display = activeCat==='montage' ? 'block' : 'none';
+  const showDivider=(activeCat==='montage'||activeCat==='all') && visible.some(c=>c.early);
+  earlyDivider.style.display = showDivider ? 'flex' : 'none';
 }
 render();
 
