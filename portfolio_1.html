@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acheron — Video Editor</title>
+
+<!-- ============================================================
+   PUBLIC PAGE = read-only. Visitors can only view + click links.
+   TO EDIT: open this page with  #edit  on the end of the URL
+            (e.g. yoursite.com/#edit). You'll get inline editing,
+            avatar upload, and link editing. Changes are LOCAL only.
+
+   TO MAKE CHANGES PERMANENT on your live site, edit the defaults:
+     Name        -> search   >Acheron<
+     Description -> search    I edit things :D
+     Avatar      -> put a URL in  <img class="avatar-img" src="...">
+     Social links-> set the href="" on the .social <a> tags
+     [EMAIL]     -> contact section
+   Deploy: upload this one file to Netlify / GitHub Pages / Vercel.
+   ============================================================ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0c0c0e;
+  --bg-2:#161618;
+  --line:#262629;
+  --ink:#f4f2f0;
+  --muted:#8d8d94;
+  --pink:#ff2e74;
+  --purple:#a855f7;
+  --grad:linear-gradient(120deg,#ff2e74,#a855f7);
+  --maxw:920px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background-color:var(--bg);
+  background-image:radial-gradient(rgba(255,255,255,.022) 1px,transparent 1px);
+  background-size:22px 22px;
+  color:var(--ink);font-family:'Quicksand',sans-serif;font-weight:500;
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:var(--pink);color:#0c0c0e}
+::-webkit-scrollbar{width:9px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#34343a;border-radius:10px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* edit banner */
+.edit-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--grad);color:#fff;font-weight:700;font-size:13px;text-align:center;padding:8px}
+body.editing .edit-banner{display:block}
+
+/* ---------- profile ---------- */
+.profile{text-align:center;padding:90px 0 46px}
+.avatar{width:128px;height:128px;border-radius:50%;margin:0 auto;overflow:hidden;
+  background:var(--bg-2);display:flex;align-items:center;justify-content:center;position:relative}
+.avatar-img{width:100%;height:100%;object-fit:cover;display:none}
+.avatar-letter{font-size:56px;font-weight:700;background:var(--grad);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+body.editing .avatar{cursor:pointer}
+.avatar .cam{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;
+  font-size:12px;font-weight:600;display:none;align-items:center;justify-content:center}
+body.editing .avatar:hover .cam{display:flex}
+
+.pname{font-size:clamp(38px,9vw,60px);font-weight:700;line-height:1.05;margin-top:18px;
+  letter-spacing:-.01em;outline:none;border-radius:10px;display:inline-block;padding:0 8px}
+.handle{font-weight:600;color:var(--muted);margin-top:2px;font-size:15px}
+.pdesc{margin-top:14px;font-size:19px;font-weight:600;max-width:480px;margin-left:auto;margin-right:auto;
+  outline:none;border-radius:10px;padding:2px 8px}
+body.editing [contenteditable]{box-shadow:inset 0 0 0 1.5px var(--line)}
+body.editing [contenteditable]:focus{box-shadow:inset 0 0 0 1.5px var(--pink);background:rgba(255,46,116,.06)}
+
+/* socials */
+.socials{display:flex;gap:12px;justify-content:center;margin-top:20px}
+.social{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--bg-2);
+  display:flex;align-items:center;justify-content:center;color:var(--ink);transition:.22s;text-decoration:none}
+.social:hover{transform:translateY(-3px);border-color:transparent;background:var(--grad);color:#fff}
+.social svg{width:21px;height:21px;fill:currentColor}
+
+/* programs */
+.programs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:26px}
+.prog{display:flex;align-items:center;gap:9px;background:var(--bg-2);border:1px solid var(--line);
+  border-radius:13px;padding:8px 14px;font-weight:600;font-size:13px}
+.prog .ic{width:27px;height:27px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff}
+.prog small{display:block;font-size:10px;color:var(--pink);font-weight:700;letter-spacing:.05em}
+.ae{background:linear-gradient(135deg,#2a1b5e,#5b3df5)}
+.pr{background:linear-gradient(135deg,#3a1b5e,#9a5cff)}
+.dr{background:linear-gradient(135deg,#5e1b3a,#ff4d7d)}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0 30px;
+  border-top:1px solid var(--line);padding-top:30px}
+.tab{font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;border:1px solid var(--line);
+  background:transparent;color:var(--muted);padding:9px 18px;border-radius:30px;transition:.22s}
+.tab:hover{color:var(--ink)}
+.tab.active{background:var(--grad);color:#fff;border-color:transparent}
+
+/* ---------- work grid ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  transition:.28s;text-decoration:none;color:inherit}
+.card:hover{border-color:var(--pink);transform:translateY(-4px)}
+.thumb{aspect-ratio:16/9;position:relative;display:flex;align-items:center;justify-content:center;background-size:cover}
+.t1{background:linear-gradient(135deg,#3a103a,#ff2e74 150%)}
+.t2{background:linear-gradient(135deg,#2a1050,#a855f7 150%)}
+.t3{background:linear-gradient(135deg,#50102e,#ff5c8a 160%)}
+.t4{background:linear-gradient(135deg,#1c1040,#7b3dff 150%)}
+.t5{background:linear-gradient(135deg,#451033,#ff3d6e 150%)}
+.t6{background:linear-gradient(135deg,#231050,#9a5cff 150%)}
+.thumb::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.22);transition:.3s}
+.card:hover .thumb::after{background:rgba(0,0,0,.04)}
+.play-circle{width:52px;height:52px;border-radius:50%;background:rgba(12,12,14,.5);border:2px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;position:relative;z-index:2;transition:.3s}
+.card:hover .play-circle{background:var(--grad);border-color:transparent}
+.play-circle::before{content:"";border-left:13px solid var(--ink);border-top:8px solid transparent;
+  border-bottom:8px solid transparent;margin-left:3px;transition:.3s}
+.card:hover .play-circle::before{border-left-color:#fff}
+.badge{position:absolute;top:9px;left:9px;z-index:2;font-size:11px;font-weight:700;
+  background:rgba(0,0,0,.55);padding:3px 9px;border-radius:20px}
+.card-body{padding:14px 16px}
+.card-body .for{font-size:12px;font-weight:700}
+.card-body h3{font-size:18px;font-weight:700;margin:4px 0 8px}
+.card-meta{display:flex;gap:14px;color:var(--muted);font-size:13px;font-weight:600}
+.card-meta b{color:var(--ink)}
+
+/* ---------- sections ---------- */
+section{padding:60px 0}
+.eyebrow{font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  margin-bottom:14px;display:flex;align-items:center;gap:12px;justify-content:center}
+.eyebrow::before,.eyebrow::after{content:"";width:26px;height:2px;background:var(--grad)}
+.sec-title{font-size:clamp(28px,5vw,42px);font-weight:700;text-align:center;margin-bottom:34px;line-height:1.05}
+
+.svc{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:680px){.svc{grid-template-columns:1fr}}
+.svc-item{border:1px solid var(--line);border-radius:16px;padding:26px 22px;background:var(--bg-2);transition:.28s}
+.svc-item:hover{border-color:var(--purple);transform:translateY(-3px)}
+.svc-item .n{font-weight:700;font-size:14px}
+.svc-item h3{font-size:21px;font-weight:700;margin:10px 0 7px}
+.svc-item p{color:var(--muted);font-size:14px;font-weight:500}
+
+.contact{text-align:center}
+.contact h2{font-size:clamp(34px,8vw,72px);font-weight:700;line-height:.98;margin:6px 0 24px}
+.cbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{font-weight:700;font-size:14px;text-decoration:none;padding:13px 22px;border-radius:13px;
+  display:inline-flex;align-items:center;gap:9px;transition:.24s;border:1px solid var(--line);color:var(--ink)}
+.btn-primary{background:var(--grad);border:none;color:#fff}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-ghost:hover{border-color:var(--ink)}
+
+footer{padding:30px 0;border-top:1px solid var(--line);text-align:center;font-size:13px;font-weight:600;color:var(--muted)}
+
+.reveal{opacity:0;transform:translateY(22px);transition:.6s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<div class="edit-banner">✎ EDIT MODE — click your avatar, name, bio or social icons to change them. Remove <b>#edit</b> from the URL to see the public view.</div>
+
+<!-- ===================== PROFILE ===================== -->
+<div class="profile wrap">
+  <div class="avatar" id="avatar" title="Profile picture">
+    <img class="avatar-img" id="avatarImg" alt="profile picture">
+    <span class="avatar-letter" id="avatarLetter">A</span>
+    <div class="cam">Change ▴</div>
+    <input type="file" id="avatarInput" accept="image/*" hidden>
+  </div>
+
+  <h1 class="pname" id="name" spellcheck="false">Acheron</h1>
+  <div class="handle">Video Editor</div>
+  <div class="pdesc" id="desc" spellcheck="false">I edit things :D</div>
+
+  <!-- set href="" to your real links, or use #edit mode -->
+  <div class="socials">
+    <a class="social" data-label="YouTube" href="#" target="_blank" rel="noopener" title="YouTube">
+      <svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.5 15.5v-7l6.5 3.5z"/></svg>
+    </a>
+    <a class="social" data-label="Twitter / X" href="#" target="_blank" rel="noopener" title="Twitter / X">
+      <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+  </div>
+
+  <div class="programs">
+    <div class="prog"><span class="ic ae">Ae</span><span>After Effects<small>MAIN</small></span></div>
+    <div class="prog"><span class="ic pr">Pr</span><span>Premiere Pro</span></div>
+    <div class="prog"><span class="ic dr">DR</span><span>DaVinci Resolve</span></div>
+  </div>
+</div>
+
+<!-- ===================== WORK + TABS ===================== -->
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-cat="all">All</button>
+    <button class="tab" data-cat="long">Long-form</button>
+    <button class="tab" data-cat="shorts">Shorts</button>
+    <button class="tab" data-cat="montage">Montage / AMV</button>
+  </div>
+
+  <div class="grid" id="grid">
+    <a href="#" class="card" data-cat="long">
+      <div class="thumb t1"><div class="play-circle"></div><span class="badge">Long-form</span></div>
+      <div class="card-body"><div class="for grad-text">For BTMC</div><h3>osu! Long-form Edit</h3>
+        <div class="card-meta"><span><b>240K</b> views</span><span><b>94%</b> retention</span></div></div>
+    </a>
+    <a href="#" class="card" data-cat="long">
+      <div class="thumb t3"><div class="play-circle"></div><span class="badge">Long-form</span></div>
+      <div class="card-body"><div class="for grad-text">For Zy0x</div><h3>Story Video</h3>
+        <div class="card-meta"><span><b>160K</b> views</span><span><b>YouTube</b></span></div></div>
+    </a>
+    <a href="#" class="card" data-cat="shorts">
+      <div class="thumb t2"><div class="play-circle"></div><span class="badge">Short</span></div>
+      <div class="card-body"><div class="for grad-text">For Zy0x</div><h3>Stream Clip</h3>
+        <div class="card-meta"><span><b>1.2M</b> views</span><span><b>Shorts</b></span></div></div>
+    </a>
+    <a href="#" class="card" data-cat="shorts">
+      <div class="thumb t5"><div class="play-circle"></div><span class="badge">Short</span></div>
+      <div class="card-body"><div class="for grad-text">For BTMC</div><h3>Funny Moment</h3>
+        <div class="card-meta"><span><b>880K</b> views</span><span><b>TikTok</b></span></div></div>
+    </a>
+    <a href="#" class="card" data-cat="montage">
+      <div class="thumb t4"><div class="play-circle"></div><span class="badge">Montage</span></div>
+      <div class="card-body"><div class="for grad-text">For BTMC</div><h3>Highlight Montage</h3>
+        <div class="card-meta"><span><b>180K</b> views</span><span><b>Montage</b></span></div></div>
+    </a>
+    <a href="#" class="card" data-cat="montage">
+      <div class="thumb t6"><div class="play-circle"></div><span class="badge">AMV</span></div>
+      <div class="card-body"><div class="for grad-text">Personal</div><h3>AMV / Sync Edit</h3>
+        <div class="card-meta"><span><b>After Effects</b></span><span><b>AMV</b></span></div></div>
+    </a>
+  </div>
+</div>
+
+<!-- ===================== SERVICES ===================== -->
+<section id="services">
+  <div class="wrap">
+    <div class="eyebrow"><span class="grad-text">What I edit</span></div>
+    <h2 class="sec-title">Services</h2>
+    <div class="svc">
+      <div class="svc-item"><div class="n grad-text">01</div><h3>Long-form</h3><p>YouTube edits built for watch-time — pacing, b-roll, sound design and clean storytelling.</p></div>
+      <div class="svc-item"><div class="n grad-text">02</div><h3>Shorts &amp; Clips</h3><p>Vertical edits for Shorts, Reels &amp; TikTok. Punchy hooks, captions, fast cuts.</p></div>
+      <div class="svc-item"><div class="n grad-text">03</div><h3>Montage &amp; AMV</h3><p>Gameplay montages and sync-heavy AMV edits with beat-matched, high-energy pacing.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONTACT ===================== -->
+<section id="contact" class="contact">
+  <div class="wrap">
+    <div class="eyebrow"><span class="grad-text">Let's work</span></div>
+    <h2>Got a project?<br><span class="grad-text">Let's cut.</span></h2>
+    <div class="cbtns">
+      <a href="mailto:[EMAIL]" class="btn btn-primary">[EMAIL]</a>
+      <a href="#" class="btn btn-ghost">DM me</a>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap">© <span id="yr"></span> <span id="footName">Acheron</span> — Video Editor</div></footer>
+
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+
+// ---------- EDIT MODE (only when URL ends in #edit) ----------
+let editMode=location.hash==='#edit';
+const nameEl=document.getElementById('name'),descEl=document.getElementById('desc');
+function applyEdit(){
+  document.body.classList.toggle('editing',editMode);
+  nameEl.contentEditable=editMode;
+  descEl.contentEditable=editMode;
+}
+addEventListener('hashchange',()=>{editMode=location.hash==='#edit';applyEdit();});
+applyEdit();
+
+// name sync
+function syncName(){
+  const v=nameEl.textContent.trim()||'Acheron';
+  document.getElementById('footName').textContent=v;
+  document.getElementById('avatarLetter').textContent=(v[0]||'A').toUpperCase();
+  document.title=v+' — Video Editor';
+}
+nameEl.addEventListener('input',syncName);
+
+// avatar upload (edit mode only)
+const avatar=document.getElementById('avatar'),input=document.getElementById('avatarInput'),
+      img=document.getElementById('avatarImg'),letter=document.getElementById('avatarLetter');
+avatar.addEventListener('click',()=>{if(editMode)input.click();});
+input.addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{img.src=ev.target.result;img.style.display='block';letter.style.display='none';};
+  r.readAsDataURL(f);
+});
+// if a default src is set in HTML, show it
+if(img.getAttribute('src')){img.style.display='block';letter.style.display='none';}
+
+// social links: edit mode sets URL, view mode navigates
+document.querySelectorAll('.social').forEach(a=>{
+  a.addEventListener('click',e=>{
+    if(editMode){
+      e.preventDefault();
+      const cur=a.getAttribute('href')==='#'?'':a.getAttribute('href');
+      const u=prompt('Link for '+a.dataset.label+':',cur);
+      if(u!==null)a.setAttribute('href',u.trim()||'#');
+    }else if(!a.getAttribute('href')||a.getAttribute('href')==='#'){
+      e.preventDefault(); // no link set yet
+    }
+  });
+});
+
+// ---------- TABS / FILTER ----------
+const tabs=document.getElementById('tabs'),cards=[...document.querySelectorAll('.card')];
+tabs.addEventListener('click',e=>{
+  const b=e.target.closest('.tab');if(!b)return;
+  tabs.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  b.classList.add('active');
+  const cat=b.dataset.cat;
+  cards.forEach(c=>{c.style.display=(cat==='all'||c.dataset.cat===cat)?'':'none';});
+});
+
+// ---------- reveal ----------
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('section').forEach(el=>{el.classList.add('reveal');io.observe(el)});
+</script>
+</body>
+</html>
