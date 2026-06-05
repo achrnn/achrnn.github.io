@@ -605,7 +605,7 @@ FEATURED.forEach(f=>{
       <div class="feat-metric grad-text">${f.metric}</div>
       ${f.breakdown?`<div class="feat-breakdown"><button class="feat-bd-toggle" type="button" aria-expanded="false">Platform Breakdown<svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="feat-bd-wrap"><div class="feat-bd-list"><div class="feat-bd-pad">${f.breakdown.map(b=>`<span class="feat-bd-row"><span class="pf">${b[0]}</span><span class="vw">${b[1]}</span></span>`).join('')}</div></div></div></div>`:''}
       <p><span class="role-label">Role</span><span class="role">${f.role}</span></p>
-      <a class="btn btn-watch" href="https://www.youtube.com/watch?v=${f.id}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Watch</a>
+      <a class="btn btn-watch" href="https://www.youtube.com/watch?v=${f.id}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Watch on YouTube</a>
     </div>`;
   const thumb=row.querySelector('.thumb');
   thumb.addEventListener('click',()=>{
