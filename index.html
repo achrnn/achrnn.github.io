@@ -192,10 +192,16 @@ button.social{border:0;padding:0;cursor:pointer;font:inherit;color:#fff}
 
 /* remake + early-edit labels */
 .card-foot{position:absolute;right:13px;bottom:11px;display:flex;align-items:center}
-.badge-remake{font-size:9px;font-weight:700;
-  letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:7px;
-  background:rgba(255,111,165,.24);border:1px solid rgba(255,111,165,.55);color:#ffcfe0;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.badge-remake{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;
+  letter-spacing:.11em;text-transform:uppercase;padding:4px 11px 4px 9px;border-radius:999px;color:#f6e3b8;
+  background:linear-gradient(135deg,rgba(245,201,123,.20),rgba(245,201,123,.05));
+  border:1px solid rgba(245,201,123,.42);
+  box-shadow:0 2px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.14);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:color .24s,border-color .24s,box-shadow .24s}
+.badge-remake::before{content:"";width:11px;height:11px;flex:0 0 auto;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 4 23 10 17 10'/%3E%3Cpolyline points='1 20 1 14 7 14'/%3E%3Cpath d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 4 23 10 17 10'/%3E%3Cpolyline points='1 20 1 14 7 14'/%3E%3Cpath d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15'/%3E%3C/svg%3E") center/contain no-repeat}
+.card:hover .badge-remake{color:#fff2d6;border-color:rgba(245,201,123,.7);box-shadow:0 3px 14px rgba(245,201,123,.20),inset 0 1px 0 rgba(255,255,255,.2)}
 .badge-early{position:absolute;bottom:9px;left:9px;z-index:2;font-size:10px;font-weight:600;
   letter-spacing:.03em;color:rgba(255,255,255,.55);background:rgba(0,0,0,.32);padding:2px 8px;border-radius:20px}
 .card.is-early{opacity:.82}
@@ -270,7 +276,7 @@ body.lb-open{overflow:hidden}
 .badge--shorts{background:rgba(255,111,165,.6);border-color:rgba(255,255,255,.45);color:#fff}
 .badge--edits{background:rgba(45,200,170,.6);border-color:rgba(255,255,255,.45);color:#fff}
 .badge--montage{background:rgba(176,124,240,.6);border-color:rgba(255,255,255,.45);color:#fff;font-style:italic}
-.card-body{padding:13px 15px;position:relative}
+.card-body{padding:13px 15px 23px;position:relative}
 .v-title{font-size:15px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;
   -webkit-box-orient:vertical;overflow:hidden;min-height:2.7em;
   color:var(--ink);text-decoration:none;transition:color .18s}
@@ -650,8 +656,11 @@ if(firstEarly)grid.insertBefore(earlyDivider,firstEarly.el);
 
 /* ---------- filter + pagination (9 at a time) ---------- */
 let activeCat='all', shown=PAGE;
+function matchList(){return cards.filter(c=>activeCat==='all'?c.cat!=='montage':c.cat===activeCat);}
+/* if only a tiny tail (<4) would remain hidden, reveal the rest instead of leaving a near-empty extra page */
+function absorbTail(){const total=matchList().length; if(total-shown>0 && total-shown<4) shown=total;}
 function render(){
-  const matches=cards.filter(c=>activeCat==='all'?c.cat!=='montage':c.cat===activeCat);
+  const matches=matchList();
   const total=matches.length;
   shown=Math.min(Math.max(shown,PAGE),Math.max(total,PAGE));
   cards.forEach(c=>{c.el.style.display='none';});
@@ -665,6 +674,7 @@ function render(){
   const showDivider=activeCat==='montage' && visible.some(c=>c.early);
   earlyDivider.style.display = showDivider ? 'flex' : 'none';
 }
+absorbTail();
 render();
 
 const tabs=document.getElementById('tabs');
@@ -672,9 +682,9 @@ tabs.addEventListener('click',e=>{
   const b=e.target.closest('.tab');if(!b)return;
   tabs.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   b.classList.add('active');
-  activeCat=b.dataset.cat; shown=PAGE; render();
+  activeCat=b.dataset.cat; shown=PAGE; absorbTail(); render();
 });
-moreBtn.addEventListener('click',()=>{shown+=PAGE; render();});
+moreBtn.addEventListener('click',()=>{shown+=PAGE; absorbTail(); render();});
 lessBtn.addEventListener('click',()=>{shown=Math.max(shown-PAGE,PAGE); render();});
 collapseBtn.addEventListener('click',()=>{
   shown=PAGE; render();
