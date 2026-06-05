@@ -307,8 +307,7 @@ section{padding:62px 0}
 .feat-bd-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.4,0,.2,1)}
 .feat-bd-wrap.open{grid-template-rows:1fr}
 .feat-bd-list{overflow:hidden;min-height:0;contain:paint}
-.feat-bd-pad{display:flex;flex-direction:column;gap:5px;padding:9px 0 0 1px;opacity:0;transition:opacity .25s ease .03s}
-.feat-bd-wrap.open .feat-bd-pad{opacity:1}
+.feat-bd-pad{display:flex;flex-direction:column;gap:5px;padding:9px 0 0 1px}
 .feat-bd-row{display:flex;align-items:center;gap:10px;font-weight:600}
 .feat-bd-row .pf{color:var(--muted);min-width:78px}
 .feat-bd-row .vw{color:var(--ink);font-weight:700}
@@ -333,11 +332,11 @@ section{padding:62px 0}
 .btn-discord{background:#5865f2;border:none;color:#fff}
 .btn-discord:hover{transform:translateY(-2px)}
 .btn-discord svg{width:21px;height:21px;fill:#fff}
-.btn-watch{background:linear-gradient(135deg,#2fbf95 0%,#129e7a 100%);border:none;color:#04261e;font-weight:700;
-  padding:16px 30px;font-size:16.5px;
-  box-shadow:0 8px 20px rgba(24,170,132,.32),inset 0 1px 0 rgba(255,255,255,.28)}
-.btn-watch:hover{transform:translateY(-2px);box-shadow:0 13px 28px rgba(24,170,132,.45),inset 0 1px 0 rgba(255,255,255,.28)}
-.btn-watch svg{width:20px;height:20px;fill:#04261e}
+.btn-watch{background:linear-gradient(135deg,#ff4444 0%,#e00000 100%);border:none;color:#fff;font-weight:700;
+  padding:14px 26px;font-size:17px;letter-spacing:.01em;gap:9px;
+  box-shadow:0 8px 20px rgba(224,0,0,.32),inset 0 1px 0 rgba(255,255,255,.28)}
+.btn-watch:hover{transform:translateY(-2px);box-shadow:0 13px 28px rgba(224,0,0,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+.btn-watch svg{width:20px;height:20px;fill:#fff}
 .copied{height:18px;margin-top:14px;font-weight:700;font-size:13px;color:var(--blue);opacity:0;transition:.2s}
 .copied.show{opacity:1}
 
@@ -605,13 +604,12 @@ FEATURED.forEach(f=>{
       <div class="feat-metric grad-text">${f.metric}</div>
       ${f.breakdown?`<div class="feat-breakdown"><button class="feat-bd-toggle" type="button" aria-expanded="false">Platform Breakdown<svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="feat-bd-wrap"><div class="feat-bd-list"><div class="feat-bd-pad">${f.breakdown.map(b=>`<span class="feat-bd-row"><span class="pf">${b[0]}</span><span class="vw">${b[1]}</span></span>`).join('')}</div></div></div></div>`:''}
       <p><span class="role-label">Role</span><span class="role">${f.role}</span></p>
-      <a class="btn btn-watch" href="https://www.youtube.com/watch?v=${f.id}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Watch on YouTube</a>
+      <a class="btn btn-watch" href="https://www.youtube.com/watch?v=${f.id}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>YouTube</a>
     </div>`;
   const thumb=row.querySelector('.thumb');
   thumb.addEventListener('click',()=>{
     thumb.classList.add('playing');
-    thumb.insertAdjacentHTML('beforeend',
-      `<iframe src="https://www.youtube.com/embed/${f.id}?autoplay=1&rel=0" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe>`);
+    mountPlayer(thumb,f.id);
   });
   const tog=row.querySelector('.feat-bd-toggle');
   if(tog){
@@ -752,15 +750,30 @@ addEventListener('scroll',queueScene,{passive:true});
 addEventListener('resize',queueScene,{passive:true});
 updateScene();
 
+/* ---------- YouTube players (API-managed so the default volume can be capped) ---------- */
+const YT_VOL=20;
+let ytReady=false;const ytQueue=[];
+window.onYouTubeIframeAPIReady=()=>{ytReady=true;ytQueue.forEach(fn=>fn());ytQueue.length=0;};
+(function(){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);})();
+function mountPlayer(container,id){
+  const host=document.createElement('div');container.appendChild(host);
+  const make=()=>new YT.Player(host,{
+    videoId:id,width:'100%',height:'100%',
+    playerVars:{autoplay:0,rel:0,modestbranding:1,iv_load_policy:3,playsinline:1,fs:1,origin:location.origin},
+    events:{onReady:e=>{try{e.target.setVolume(YT_VOL);}catch(_){}e.target.playVideo();}}
+  });
+  if(ytReady)make();else ytQueue.push(make);
+}
 /* ---------- lightbox (markup lives after this script, so look up lazily) ---------- */
 function openLightbox(id,title,poster){
   const lb=document.getElementById('lightbox');
   const stage=lb.querySelector('#lbStage');
   stage.innerHTML=`<div class="lb-poster"><img class="pbg" src="${poster}" alt="" onerror="ytFallback(this,'${id}')"><img class="pfg" src="${poster}" alt="" onerror="ytFallback(this,'${id}')"><div class="pc"></div></div>`;
   stage.querySelector('.lb-poster').addEventListener('click',()=>{
-    stage.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe>`;
+    stage.innerHTML='';
+    mountPlayer(stage,id);
   });
-  lb.querySelector('#lbTitle').textContent=(title&&title.trim()&&title!=='Watch on YouTube')?title:'';
+  lb.querySelector('#lbTitle').textContent=(title&&title.trim()&&title!=='Watch on YouTube'&&title!=='YouTube')?title:'';
   lb.classList.add('open');lb.setAttribute('aria-hidden','false');document.body.classList.add('lb-open');
 }
 function closeLightbox(){
