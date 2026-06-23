@@ -501,6 +501,8 @@ document.getElementById('yr').textContent=new Date().getFullYear();
    ============================================================ */
 const VIDEOS=[
   // Long-form (newest first)
+  {id:'e1bCibq2I1g', type:'long'},
+  {id:'I2SYhc6RS28', type:'long'},
   {id:'Vrv5vjyiFcg', type:'long'},
   {id:'fSWXzQr8mrc', type:'long'},
   // Shorts (newest first)
@@ -596,11 +598,12 @@ const cards=VIDEOS.map(v=>{
 
 /* ---------- featured work ---------- */
 const FEATURED=[
-  {id:'Vrv5vjyiFcg', type:'long',   metric:'90K+ views', role:'Director, Camera Man, Editor'},
-  {id:'_z-I8i_vGn8', type:'shorts', metric:'1.2M+ views', role:'Editor',
-   breakdown:[['YouTube','398K'],['Instagram','293K'],['TikTok','456K']]},
-  {id:'7YLGbUR3BpI', type:'shorts', metric:'563K+ views', role:'Director, Camera Man, Editor',
-   breakdown:[['YouTube','436K'],['Instagram','127K']]},
+  {id:'Vrv5vjyiFcg', type:'long',   metric:'160K+ views', role:'Director, Camera Man, Editor'},
+  {id:'e1bCibq2I1g', type:'long',   metric:'126K+ views', role:'Editor'},
+  {id:'_z-I8i_vGn8', type:'shorts', metric:'1.6M+ views', role:'Editor',
+   breakdown:[['YouTube','747K'],['Instagram','335K'],['TikTok','500K']]},
+  {id:'7YLGbUR3BpI', type:'shorts', metric:'645K+ views', role:'Director, Camera Man, Editor',
+   breakdown:[['YouTube','463K'],['Instagram','137K'],['TikTok','45K']]},
 ];
 const featList=document.getElementById('featList');
 FEATURED.forEach(f=>{
